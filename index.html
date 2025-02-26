@@ -230,9 +230,9 @@
     console.log("Script is running!");
 
     // ---------------------------------------------------------------------
-    // MASTER LIST OF ALL NHTSA FIELDS (140 total).
+    // MASTER LIST OF ALL NHTSA FIELDS (shortened for brevity)
     // ---------------------------------------------------------------------
-     const masterFieldsList = [
+        const masterFieldsList = [
   // Battery fields
   { numericId: 1,   label: "Other Battery Info", propertyName: "OtherBatteryInfo", enabled: false },
   { numericId: 2,   label: "Battery Type", propertyName: "BatteryType", enabled: false },
@@ -447,8 +447,8 @@
   { numericId: 196, label: "Vehicle Descriptor", propertyName: "VehicleDescriptor", enabled: false }
 ];
 
-    // IDs that should be enabled by default (first load).
-    const DEFAULT_ENABLED_IDS = [29, 26, 28];  // For example: ModelYear, Make, Model
+    // IDs enabled by default
+    const DEFAULT_ENABLED_IDS = [29, 26, 28];  // Example: ModelYear, Make, Model
 
     // Current config of fields (loaded from localStorage or from master list)
     let currentFieldsList = [];
@@ -675,10 +675,55 @@
     }
 
     // -----------------------------------------------------------
-    // 6) DECODING LOGIC + "COPY ALL" BUTTON + LOADING SPINNER
+    // 6) DECODING LOGIC + CHUNKING + LOADING SPINNER
     // -----------------------------------------------------------
+
+    // Helper to chunk an array into smaller subarrays
+    function chunkArray(arr, chunkSize) {
+      const chunks = [];
+      for (let i = 0; i < arr.length; i += chunkSize) {
+        chunks.push(arr.slice(i, i + chunkSize));
+      }
+      return chunks;
+    }
+
+    // Decode a list of VINs in chunks to avoid huge requests/timeouts
+    async function decodeVinListInChunks(vinList) {
+      const CHUNK_SIZE = 50; // try up to 50 VINs per request
+      const allResults = [];
+
+      // Split into arrays of up to CHUNK_SIZE each
+      const vinChunks = chunkArray(vinList, CHUNK_SIZE);
+
+      // Process each chunk sequentially
+      for (const chunk of vinChunks) {
+        // Join chunk into a single string with semicolons
+        const batchString = chunk.join(';');
+
+        // Perform the fetch
+        const response = await fetch(
+          'https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVINValuesBatch/',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+              format: 'json',
+              data: batchString
+            })
+          }
+        );
+
+        const data = await response.json();
+        const results = data.Results || [];
+        // Accumulate into allResults
+        allResults.push(...results);
+      }
+
+      return allResults;
+    }
+
     decodeBtn.addEventListener('click', async () => {
-      console.log("Decode button clicked!"); // LOG #1
+      console.log("Decode button clicked!");
 
       const vinList = vinInput.value
         .split(/\n/g)
@@ -696,33 +741,19 @@
       // Clear old results
       resultsContainer.innerHTML = '';
       copyAllContainer.innerHTML = '';
-      const batchString = vinList.join(';');
 
       try {
-        const response = await fetch(
-          'https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVINValuesBatch/',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({
-              format: 'json',
-              data: batchString
-            })
-          }
-        );
-        
-        const data = await response.json();
-        console.log("Decoded data from NHTSA:", data); // LOG #2
+        // Decode all VINs in manageable chunks
+        const allDecodedResults = await decodeVinListInChunks(vinList);
 
-        // The main array is in data.Results
-        const results = data.Results || [];
-        console.log("Results array:", results); // LOG #3
+        console.log("All decoded results:", allDecodedResults);
 
-        if (results.length > 0) {
+        if (allDecodedResults.length > 0) {
+          // Create the "Copy ALL" button
           const copyAllBtn = document.createElement('button');
           copyAllBtn.textContent = 'Copy ALL VIN Data';
           copyAllBtn.addEventListener('click', () => {
-            const lines = results.map(item => getRowData(item));
+            const lines = allDecodedResults.map(item => getRowData(item));
             const finalString = lines.join('\n');
             navigator.clipboard.writeText(finalString)
               .then(() => showToast('Copied all VIN data to clipboard!'))
@@ -731,11 +762,11 @@
           copyAllContainer.appendChild(copyAllBtn);
         }
 
-        // For each VIN decoded
-        results.forEach((decodedItem, idx) => {
+        // Render each VIN block
+        allDecodedResults.forEach((decodedItem, idx) => {
           const vinDiv = document.createElement('div');
           vinDiv.className = 'vin-block';
-          
+
           const vinHeader = document.createElement('h3');
           vinHeader.innerText = `#${idx + 1} VIN: ${decodedItem.VIN || 'null'}`;
           vinDiv.appendChild(vinHeader);
@@ -761,7 +792,7 @@
             li.textContent = `${f.label}: ${value}`;
             dataList.appendChild(li);
           });
-          
+
           vinDiv.appendChild(dataList);
           resultsContainer.appendChild(vinDiv);
         });

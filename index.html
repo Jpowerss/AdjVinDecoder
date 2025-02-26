@@ -751,13 +751,16 @@
     });
 
     // Create a single tab-separated line for one VIN’s data
-    function getRowData(decodedItem) {
-      const enabledFields = currentFieldsList.filter(f => f.enabled);
-      const values = enabledFields.map(f => {
-        return decodedItem[f.propertyName] || 'null';
-      });
-      return values.join('\t');
-    }
+   function getRowData(decodedItem) {
+  const enabledFields = currentFieldsList.filter(f => f.enabled);
+  const values = enabledFields.map(f => {
+    return decodedItem[f.propertyName] || 'null';
+  });
+  
+  // Use the pipe character instead of tab:
+  return values.join('|');
+}
+
 
     // Clear / Reset
     clearBtn.addEventListener('click', () => {

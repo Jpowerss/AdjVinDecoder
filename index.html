@@ -232,12 +232,220 @@
     // ---------------------------------------------------------------------
     // MASTER LIST OF ALL NHTSA FIELDS (140 total).
     // ---------------------------------------------------------------------
-    const masterFieldsList = [
-      // (Same content as before; truncated for brevity in explanation)
-      { numericId: 1,   label: "Other Battery Info", propertyName: "OtherBatteryInfo", enabled: false },
-      /* ... rest of masterFieldsList ... */
-      { numericId: 196, label: "Vehicle Descriptor", propertyName: "VehicleDescriptor", enabled: false }
-    ];
+     const masterFieldsList = [
+  // Battery fields
+  { numericId: 1,   label: "Other Battery Info", propertyName: "OtherBatteryInfo", enabled: false },
+  { numericId: 2,   label: "Battery Type", propertyName: "BatteryType", enabled: false },
+  { numericId: 3,   label: "Bed Type", propertyName: "BedType", enabled: false },
+  { numericId: 4,   label: "Cab Type", propertyName: "CabType", enabled: false },
+  { numericId: 5,   label: "Body Class", propertyName: "BodyClass", enabled: false },
+
+  // Engine Number of Cylinders => "EngineCylinders"
+  { numericId: 9,   label: "Engine Number of Cylinders", propertyName: "EngineCylinders", enabled: false },
+  { numericId: 10,  label: "Destination Market", propertyName: "DestinationMarket", enabled: false },
+
+  // Displacement
+  { numericId: 11,  label: "Displacement (CC)", propertyName: "DisplacementCC", enabled: false },
+  { numericId: 12,  label: "Displacement (CI)", propertyName: "DisplacementCI", enabled: false },
+  { numericId: 13,  label: "Displacement (L)", propertyName: "DisplacementL", enabled: false },
+
+  { numericId: 14,  label: "Doors", propertyName: "Doors", enabled: false },
+  { numericId: 15,  label: "Drive Type", propertyName: "DriveType", enabled: false },
+  { numericId: 17,  label: "Engine Stroke Cycles", propertyName: "EngineCycles", enabled: false },
+  { numericId: 18,  label: "Engine Model", propertyName: "EngineModel", enabled: false },
+  { numericId: 21,  label: "Engine Power (kW)", propertyName: "EngineKW", enabled: false },
+  { numericId: 23,  label: "Entertainment System", propertyName: "EntertainmentSystem", enabled: false },
+  { numericId: 24,  label: "Fuel Type - Primary", propertyName: "FuelTypePrimary", enabled: false },
+
+  // GVWR => "GrossVehicleWeightRatingFrom"
+  { numericId: 25,  label: "Gross Vehicle Weight Rating From", propertyName: "GrossVehicleWeightRatingFrom", enabled: false },
+
+  { numericId: 26,  label: "Make", propertyName: "Make", enabled: false },
+
+  // "Manufacturer Name" => "Manufacturer"
+  { numericId: 27,  label: "Manufacturer Name", propertyName: "Manufacturer", enabled: false },
+  { numericId: 28,  label: "Model", propertyName: "Model", enabled: false },
+  { numericId: 29,  label: "Model Year", propertyName: "ModelYear", enabled: false },
+  { numericId: 31,  label: "Plant City", propertyName: "PlantCity", enabled: false },
+
+  // Number of Seats => "Seats"
+  { numericId: 33,  label: "Number of Seats", propertyName: "Seats", enabled: false },
+  { numericId: 34,  label: "Series", propertyName: "Series", enabled: false },
+  { numericId: 36,  label: "Steering Location", propertyName: "SteeringLocation", enabled: false },
+  { numericId: 37,  label: "Transmission Style", propertyName: "TransmissionStyle", enabled: false },
+  { numericId: 38,  label: "Trim", propertyName: "Trim", enabled: false },
+  { numericId: 39,  label: "Vehicle Type", propertyName: "VehicleType", enabled: false },
+  { numericId: 40,  label: "Windows", propertyName: "Windows", enabled: false },
+  { numericId: 41,  label: "Axles", propertyName: "Axles", enabled: false },
+  { numericId: 42,  label: "Brake System Type", propertyName: "BrakeSystemType", enabled: false },
+
+  // BatteryCells => "NumberOfBatteryCellsPerModule"
+  { numericId: 48,  label: "Number of Battery Cells per Module", propertyName: "NumberOfBatteryCellsPerModule", enabled: false },
+
+  // BedLengthIN => "BedLengthInches" is okay too, but you asked to keep original label
+  { numericId: 49,  label: "Bed Length (inches)", propertyName: "BedLengthInches", enabled: false },
+
+  { numericId: 52,  label: "Brake System Description", propertyName: "BrakeSystemDesc", enabled: false },
+  { numericId: 54,  label: "Curb Weight (pounds)", propertyName: "CurbWeightLB", enabled: false },
+
+  // Curtain => "CurtainAirBagLocations"
+  { numericId: 55,  label: "Curtain Air Bag Locations", propertyName: "CurtainAirBagLocations", enabled: false },
+  // Seat Cushion => "SeatCushionAirBagLocations"
+  { numericId: 56,  label: "Seat Cushion Air Bag Locations", propertyName: "SeatCushionAirBagLocations", enabled: false },
+
+  // BatteryA => "BatteryCurrentAmpsFrom"
+  { numericId: 57,  label: "Battery Current (Amps) From", propertyName: "BatteryCurrentAmpsFrom", enabled: false },
+  // BatteryV => "BatteryVoltageVoltsFrom"
+  { numericId: 58,  label: "Battery Voltage (Volts) From", propertyName: "BatteryVoltageVoltsFrom", enabled: false },
+  // BatteryKWh => "BatteryEnergyKWhFrom"
+  { numericId: 59,  label: "Battery Energy (kWh) From", propertyName: "BatteryEnergyKWhFrom", enabled: false },
+
+  { numericId: 60,  label: "Wheel Base Type", propertyName: "WheelBaseType", enabled: false },
+
+  // SeatRows => "SeatRows"
+  { numericId: 61,  label: "Number of Seat Rows", propertyName: "SeatRows", enabled: false },
+
+  { numericId: 62,  label: "Valve Train Design", propertyName: "ValveTrainDesign", enabled: false },
+  { numericId: 63,  label: "Transmission Speeds", propertyName: "TransmissionSpeeds", enabled: false },
+  { numericId: 64,  label: "Engine Configuration", propertyName: "EngineConfiguration", enabled: false },
+
+  // Front => "FrontAirBagLocations"
+  { numericId: 65,  label: "Front Air Bag Locations", propertyName: "FrontAirBagLocations", enabled: false },
+
+  { numericId: 66,  label: "Fuel Type - Secondary", propertyName: "FuelTypeSecondary", enabled: false },
+
+  // Fuel Injection
+  { numericId: 67,  label: "Fuel Delivery / Fuel Injection Type", propertyName: "FuelInjectionType", enabled: false },
+  
+  // Knee => "KneeAirBagLocations"
+  { numericId: 69,  label: "Knee Air Bag Locations", propertyName: "KneeAirBagLocations", enabled: false },
+
+  // Engine Brake (hp) From => "EngineHP"
+  { numericId: 71,  label: "Engine Brake (hp) From", propertyName: "EngineHP", enabled: false },
+  { numericId: 72,  label: "EV Drive Unit", propertyName: "EVDriveUnit", enabled: false },
+  { numericId: 75,  label: "Plant Country", propertyName: "PlantCountry", enabled: false },
+  { numericId: 76,  label: "Plant Company Name", propertyName: "PlantCompanyName", enabled: false },
+  { numericId: 77,  label: "Plant State", propertyName: "PlantState", enabled: false },
+  { numericId: 78,  label: "Pretensioner", propertyName: "Pretensioner", enabled: false },
+
+  // Seat Belt Type => "SeatBeltsAll"
+  { numericId: 79,  label: "Seat Belt Type", propertyName: "SeatBeltsAll", enabled: false },
+  { numericId: 81,  label: "Adaptive Cruise Control (ACC)", propertyName: "AdaptiveCruiseControl", enabled: false },
+
+  // Anti-lock => "ABS"
+  { numericId: 86,  label: "Anti-lock Braking System (ABS)", propertyName: "ABS", enabled: false },
+
+  // Crash Imminent => "CIB"
+  { numericId: 87,  label: "Crash Imminent Braking (CIB)", propertyName: "CIB", enabled: false },
+
+  // Blind Spot => "BlindSpotMon"
+  { numericId: 88,  label: "Blind Spot Warning (BSW)", propertyName: "BlindSpotMon", enabled: false },
+  
+  { numericId: 96,  label: "NCSA Body Type", propertyName: "NCSABodyType", enabled: false },
+  { numericId: 97,  label: "NCSA Make", propertyName: "NCSAMake", enabled: false },
+  { numericId: 98,  label: "NCSA Model", propertyName: "NCSAModel", enabled: false },
+  { numericId: 99,  label: "Electronic Stability Control (ESC)", propertyName: "ESC", enabled: false },
+  { numericId: 100, label: "Traction Control", propertyName: "TractionControl", enabled: false },
+  { numericId: 101, label: "Forward Collision Warning (FCW)", propertyName: "ForwardCollisionWarning", enabled: false },
+  { numericId: 102, label: "Lane Departure Warning (LDW)", propertyName: "LaneDepartureWarning", enabled: false },
+  { numericId: 103, label: "Lane Keeping Assistance (LKA)", propertyName: "LaneKeepSystem", enabled: false },
+  { numericId: 104, label: "Backup Camera", propertyName: "BackupCamera", enabled: false },
+  { numericId: 105, label: "Parking Assist", propertyName: "ParkAssist", enabled: false },
+
+  // Side => "SideAirBagLocations"
+  { numericId: 107, label: "Side Air Bag Locations", propertyName: "SideAirBagLocations", enabled: false },
+
+  { numericId: 109, label: "Trim2", propertyName: "Trim2", enabled: false },
+  { numericId: 110, label: "Series2", propertyName: "Series2", enabled: false },
+
+  // WheelBaseShort => "WheelBaseInchesFrom"
+  { numericId: 111, label: "Wheel Base (inches) From", propertyName: "WheelBaseInchesFrom", enabled: false },
+  // WheelBaseLong => "WheelBaseInchesTo"
+  { numericId: 112, label: "Wheel Base (inches) To", propertyName: "WheelBaseInchesTo", enabled: false },
+
+  { numericId: 114, label: "Note", propertyName: "Note", enabled: false },
+  { numericId: 115, label: "Number of Wheels", propertyName: "Wheels", enabled: false },
+  { numericId: 116, label: "Trailer Type Connection", propertyName: "TrailerType", enabled: false },
+  { numericId: 117, label: "Trailer Body Type", propertyName: "TrailerBodyType", enabled: false },
+  { numericId: 118, label: "Trailer Length (feet)", propertyName: "TrailerLength", enabled: false },
+  { numericId: 119, label: "Wheel Size Front (inches)", propertyName: "WheelSizeFront", enabled: false },
+  { numericId: 120, label: "Wheel Size Rear (inches)", propertyName: "WheelSizeRear", enabled: false },
+  { numericId: 121, label: "Other Restraint System Info", propertyName: "OtherRestraintSystemInfo", enabled: false },
+  { numericId: 122, label: "Cooling Type", propertyName: "CoolingType", enabled: false },
+
+  // EngineHP_to => "EngineBrakeHPTo"
+  { numericId: 125, label: "Engine Brake (hp) To", propertyName: "EngineBrakeHPTo", enabled: false },
+
+  { numericId: 126, label: "Electrification Level", propertyName: "ElectrificationLevel", enabled: false },
+  { numericId: 127, label: "Charger Level", propertyName: "ChargerLevel", enabled: false },
+  { numericId: 128, label: "Charger Power (kW)", propertyName: "ChargerPowerKW", enabled: false },
+  { numericId: 129, label: "Other Engine Info", propertyName: "OtherEngineInfo", enabled: false },
+
+  // BatteryA_to => "BatteryCurrentAmpsTo"
+  { numericId: 132, label: "Battery Current (Amps) To", propertyName: "BatteryCurrentAmpsTo", enabled: false },
+  // BatteryV_to => "BatteryVoltageVoltsTo"
+  { numericId: 133, label: "Battery Voltage (Volts) To", propertyName: "BatteryVoltageVoltsTo", enabled: false },
+  // BatteryKWh_to => "BatteryEnergyKWhTo"
+  { numericId: 134, label: "Battery Energy (kWh) To", propertyName: "BatteryEnergyKWhTo", enabled: false },
+
+  { numericId: 135, label: "Turbo", propertyName: "Turbo", enabled: false },
+  { numericId: 136, label: "Base Price ($)", propertyName: "BasePrice", enabled: false },
+  { numericId: 137, label: "Number of Battery Modules per Pack", propertyName: "BatteryModules", enabled: false },
+  { numericId: 138, label: "Number of Battery Packs per Vehicle", propertyName: "BatteryPacks", enabled: false },
+  { numericId: 139, label: "Top Speed (MPH)", propertyName: "TopSpeedMPH", enabled: false },
+  { numericId: 142, label: "Suggested VIN", propertyName: "SuggestedVIN", enabled: false },
+  { numericId: 143, label: "Error Code", propertyName: "ErrorCode", enabled: false },
+  { numericId: 144, label: "Possible Values", propertyName: "PossibleValues", enabled: false },
+  { numericId: 145, label: "Axle Configuration", propertyName: "AxleConfiguration", enabled: false },
+  { numericId: 146, label: "Engine Manufacturer", propertyName: "EngineManufacturer", enabled: false },
+  { numericId: 147, label: "Bus Length (feet)", propertyName: "BusLength", enabled: false },
+  { numericId: 148, label: "Bus Floor Configuration Type", propertyName: "BusFloorConfigType", enabled: false },
+  { numericId: 149, label: "Bus Type", propertyName: "BusType", enabled: false },
+  { numericId: 150, label: "Other Bus Info", propertyName: "OtherBusInfo", enabled: false },
+  { numericId: 151, label: "Custom Motorcycle Type", propertyName: "CustomMotorcycleType", enabled: false },
+  { numericId: 152, label: "Motorcycle Suspension Type", propertyName: "MotorcycleSuspensionType", enabled: false },
+  { numericId: 153, label: "Motorcycle Chassis Type", propertyName: "MotorcycleChassisType", enabled: false },
+  { numericId: 154, label: "Other Motorcycle Info", propertyName: "OtherMotorcycleInfo", enabled: false },
+  { numericId: 155, label: "Other Trailer Info", propertyName: "OtherTrailerInfo", enabled: false },
+  { numericId: 156, label: "Additional Error Text", propertyName: "AdditionalErrorText", enabled: false },
+  { numericId: 159, label: "Track Width (inches)", propertyName: "TrackWidth", enabled: false },
+  { numericId: 168, label: "Tire Pressure Monitoring System (TPMS) Type", propertyName: "TPMS", enabled: false },
+  { numericId: 169, label: "Active Safety System Note", propertyName: "ActiveSafetySysNote", enabled: false },
+  { numericId: 170, label: "Dynamic Brake Support (DBS)", propertyName: "DynamicBrakeSupport", enabled: false },
+  { numericId: 171, label: "Pedestrian Automatic Emergency Braking (PAEB)", propertyName: "PedestrianAutomaticEmergencyBraking", enabled: false },
+  { numericId: 172, label: "Auto-Reverse System for Windows and Sunroofs", propertyName: "AutoReverseSystem", enabled: false },
+  { numericId: 173, label: "Automatic Pedestrian Alerting Sound (for Hybrid and EV only)", propertyName: "AutomaticPedestrianAlertingSound", enabled: false },
+
+  // CAN_AACN => "AutomaticCrashNotificationACN"
+  { numericId: 174, label: "Automatic Crash Notification (ACN) / Advanced Automatic Crash Notification (AACN)", propertyName: "AutomaticCrashNotificationACN", enabled: false },
+
+  { numericId: 175, label: "Event Data Recorder (EDR)", propertyName: "EDR", enabled: false },
+
+  { numericId: 176, label: "Keyless Ignition", propertyName: "KeylessIgnition", enabled: false },
+
+  // DaytimeRunningLight => "DaytimeRunningLightsDRL"
+  { numericId: 177, label: "Daytime Running Light (DRL)", propertyName: "DaytimeRunningLightsDRL", enabled: false },
+
+  { numericId: 178, label: "Headlamp Light Source", propertyName: "HeadlampLightSource", enabled: false },
+  { numericId: 179, label: "Semiautomatic Headlamp Beam Switching", propertyName: "SemiautomaticHeadlampBeamSwitching", enabled: false },
+  { numericId: 180, label: "Adaptive Driving Beam (ADB)", propertyName: "AdaptiveDrivingBeam", enabled: false },
+  { numericId: 181, label: "SAE Automation Level From", propertyName: "SAEAutomationLevel", enabled: false },
+  { numericId: 182, label: "SAE Automation Level To", propertyName: "SAEAutomationLevel_to", enabled: false },
+  { numericId: 183, label: "Rear Cross Traffic Alert", propertyName: "RearCrossTrafficAlert", enabled: false },
+  { numericId: 184, label: "Gross Combination Weight Rating From", propertyName: "GCWR", enabled: false },
+  { numericId: 185, label: "Gross Combination Weight Rating To", propertyName: "GCWR_to", enabled: false },
+  { numericId: 186, label: "NCSA Note", propertyName: "NCSANote", enabled: false },
+
+  // "Gross Vehicle Weight Rating To" => "GrossVehicleWeightRatingTo"
+  { numericId: 190, label: "Gross Vehicle Weight Rating To", propertyName: "GrossVehicleWeightRatingTo", enabled: false },
+
+  { numericId: 191, label: "Error Text", propertyName: "ErrorText", enabled: false },
+  { numericId: 192, label: "Rear Automatic Emergency Braking", propertyName: "RearAutomaticEmergencyBraking", enabled: false },
+  { numericId: 193, label: "Blind Spot Intervention (BSI)", propertyName: "BlindSpotIntervention", enabled: false },
+  { numericId: 194, label: "Lane Centering Assistance", propertyName: "LaneCenteringAssistance", enabled: false },
+  { numericId: 195, label: "Non-Land Use", propertyName: "NonLandUse", enabled: false },
+  { numericId: 196, label: "Vehicle Descriptor", propertyName: "VehicleDescriptor", enabled: false }
+];
 
     // IDs that should be enabled by default (first load).
     const DEFAULT_ENABLED_IDS = [29, 26, 28];  // For example: ModelYear, Make, Model

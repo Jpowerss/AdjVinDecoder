@@ -754,17 +754,26 @@
  function getRowData(decodedItem) {
   const enabledFields = currentFieldsList.filter(f => f.enabled);
   const values = enabledFields.map(f => {
-    // Get the raw field from NHTSA
     let rawValue = decodedItem[f.propertyName] || 'null';
-    // Convert to string (just in case) and remove any tabs/newlines
-    rawValue = String(rawValue).replace(/[\t\r\n]+/g, ' ');
-    // Trim leading/trailing spaces, just to be safe
-    rawValue = rawValue.trim();
+    
+    // Convert to string
+    rawValue = String(rawValue)
+      // Replace any tabs, newlines, or carriage-returns with a space
+      .replace(/[\t\r\n]+/g, " ")
+      // Replace any non-breaking spaces with a regular space
+      .replace(/\u00A0/g, " ")
+      // Collapse multiple spaces down to a single space
+      .replace(/\s\s+/g, " ")
+      // Trim leading/trailing
+      .trim();
+    
     return rawValue;
   });
-  // Now join everything with a pipe
-  return values.join('|');
+  
+  // Join sanitized fields with a pipe
+  return values.join("|");
 }
+
 
 
 

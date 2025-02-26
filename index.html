@@ -28,8 +28,19 @@
       cursor: pointer;
       font-size: 14px;
     }
-    button:hover {
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    button:hover:enabled {
       background-color: #0056b3; /* Darker on hover */
+    }
+
+    /* Make VIN text area use larger font */
+    #vinInput {
+      font-size: 16px; /* adjust to your preference (e.g., 16px or 18px) */
+      width: 90%;
+      max-width: 600px;
     }
 
     /* Results Container */
@@ -229,10 +240,11 @@
   <script>
     console.log("Script is running!");
 
-    // ---------------------------------------------------------------------
-    // MASTER LIST OF ALL NHTSA FIELDS (shortened for brevity)
-    // ---------------------------------------------------------------------
-        const masterFieldsList = [
+    // ------------------------------------------------
+    // 1) MASTER LIST + DEFAULT FIELDS
+    // ------------------------------------------------
+    // (Shortened for brevity. Fill in your fields as needed.)
+      const masterFieldsList = [
   // Battery fields
   { numericId: 1,   label: "Other Battery Info", propertyName: "OtherBatteryInfo", enabled: false },
   { numericId: 2,   label: "Battery Type", propertyName: "BatteryType", enabled: false },
@@ -447,13 +459,12 @@
   { numericId: 196, label: "Vehicle Descriptor", propertyName: "VehicleDescriptor", enabled: false }
 ];
 
-    // IDs enabled by default
-    const DEFAULT_ENABLED_IDS = [29, 26, 28];  // Example: ModelYear, Make, Model
+    const DEFAULT_ENABLED_IDS = [29, 26, 28]; // For example: ModelYear, Make, Model
 
-    // Current config of fields (loaded from localStorage or from master list)
+    // Current config of fields
     let currentFieldsList = [];
 
-    // Elements
+    // DOM elements
     const vinInput = document.getElementById('vinInput');
     const decodeBtn = document.getElementById('decodeBtn');
     const clearBtn = document.getElementById('clearBtn');
@@ -474,14 +485,13 @@
     const toastMessage = document.getElementById('toastMessage');
 
     // --------------------------------------------
-    // 1) LOAD/SAVE FIELD CONFIG FROM LOCALSTORAGE
+    // 2) LOAD / SAVE FIELDS IN LOCALSTORAGE
     // --------------------------------------------
     function loadFieldConfig() {
       const saved = localStorage.getItem('vinDecoderFields');
       if (saved) {
         currentFieldsList = JSON.parse(saved);
       } else {
-        // No saved config; copy from master, enabling certain defaults
         currentFieldsList = masterFieldsList.map(field => ({
           ...field,
           enabled: DEFAULT_ENABLED_IDS.includes(field.numericId)
@@ -491,10 +501,10 @@
     function saveFieldConfig() {
       localStorage.setItem('vinDecoderFields', JSON.stringify(currentFieldsList));
     }
-    loadFieldConfig(); // initialize once
+    loadFieldConfig();
 
     // ------------------------------------------------------
-    // 2) SHOW/HIDE MODAL
+    // 3) SHOW/HIDE MODAL
     // ------------------------------------------------------
     function openModal() {
       buildFieldLists();
@@ -505,13 +515,12 @@
     }
     customizeBtn.addEventListener('click', openModal);
     closeModalBtn.addEventListener('click', () => {
-      // If user cancels, reload from storage to discard changes
-      loadFieldConfig();
+      loadFieldConfig(); // re-load to discard unsaved changes
       closeModal();
     });
 
     // ------------------------------------------------------
-    // 3) BUILD CHECKED/UNCHECKED FIELDS (DRAG & DROP)
+    // 4) BUILD CHECKED/UNCHECKED FIELDS + DRAG & DROP
     // ------------------------------------------------------
     function buildFieldLists() {
       const checked = currentFieldsList.filter(f => f.enabled);
@@ -598,14 +607,14 @@
       }
 
       if (dragSrcIsChecked === dropIsChecked) {
-        // reorder within the same group
+        // reorder within same group
         if (dropIsChecked) {
           checkedArray.splice(dropIndex, 0, item);
         } else {
           uncheckedArray.splice(dropIndex, 0, item);
         }
       } else {
-        // cross-group drag not allowed; revert
+        // cross-group drag not allowed, so revert
         if (dragSrcIsChecked) {
           checkedArray.splice(dragSrcIndex, 0, item);
         } else {
@@ -618,7 +627,7 @@
     }
 
     // -----------------------------------------------------------
-    // 4) ADD NEW FIELD
+    // 5) ADD NEW FIELD
     // -----------------------------------------------------------
     addFieldBtn.addEventListener('click', () => {
       const numId = parseInt(addFieldId.value.trim(), 10) || null;
@@ -647,13 +656,12 @@
     });
 
     // -----------------------------------------------------------
-    // 5) SAVE OR RESET DEFAULT FIELDS
+    // 6) SAVE OR RESET FIELDS
     // -----------------------------------------------------------
     saveCustomFieldsBtn.addEventListener('click', () => {
       saveFieldConfig();
       closeModal();
     });
-
     resetDefaultFieldsBtn.addEventListener('click', () => {
       currentFieldsList = masterFieldsList.map(field => ({
         ...field,
@@ -663,44 +671,34 @@
     });
 
     // -----------------------------------------------------------
-    // TOAST MESSAGE LOGIC
+    // TOAST MESSAGE
     // -----------------------------------------------------------
     function showToast(message) {
       toastMessage.textContent = message;
       toastMessage.style.display = 'block';
-      // Hide after 0.5 second
       setTimeout(() => {
         toastMessage.style.display = 'none';
       }, 500);
     }
 
     // -----------------------------------------------------------
-    // 6) DECODING LOGIC + CHUNKING + LOADING SPINNER
+    // 7) CHUNKING + DECODING LOGIC
     // -----------------------------------------------------------
-
-    // Helper to chunk an array into smaller subarrays
-    function chunkArray(arr, chunkSize) {
+    function chunkArray(arr, size) {
       const chunks = [];
-      for (let i = 0; i < arr.length; i += chunkSize) {
-        chunks.push(arr.slice(i, i + chunkSize));
+      for (let i = 0; i < arr.length; i += size) {
+        chunks.push(arr.slice(i, i + size));
       }
       return chunks;
     }
 
-    // Decode a list of VINs in chunks to avoid huge requests/timeouts
     async function decodeVinListInChunks(vinList) {
-      const CHUNK_SIZE = 50; // try up to 50 VINs per request
+      const CHUNK_SIZE = 50;
       const allResults = [];
-
-      // Split into arrays of up to CHUNK_SIZE each
       const vinChunks = chunkArray(vinList, CHUNK_SIZE);
 
-      // Process each chunk sequentially
       for (const chunk of vinChunks) {
-        // Join chunk into a single string with semicolons
         const batchString = chunk.join(';');
-
-        // Perform the fetch
         const response = await fetch(
           'https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVINValuesBatch/',
           {
@@ -712,13 +710,10 @@
             })
           }
         );
-
         const data = await response.json();
         const results = data.Results || [];
-        // Accumulate into allResults
         allResults.push(...results);
       }
-
       return allResults;
     }
 
@@ -742,25 +737,25 @@
       resultsContainer.innerHTML = '';
       copyAllContainer.innerHTML = '';
 
+      // Create "Copy ALL" button upfront (disabled)
+      const copyAllBtn = document.createElement('button');
+      copyAllBtn.textContent = 'Copy ALL VIN Data';
+      copyAllBtn.disabled = true; // Start disabled
+      copyAllContainer.appendChild(copyAllBtn);
+
       try {
-        // Decode all VINs in manageable chunks
+        // Decode all VINs in chunks
         const allDecodedResults = await decodeVinListInChunks(vinList);
 
-        console.log("All decoded results:", allDecodedResults);
-
-        if (allDecodedResults.length > 0) {
-          // Create the "Copy ALL" button
-          const copyAllBtn = document.createElement('button');
-          copyAllBtn.textContent = 'Copy ALL VIN Data';
-          copyAllBtn.addEventListener('click', () => {
-            const lines = allDecodedResults.map(item => getRowData(item));
-            const finalString = lines.join('\n');
-            navigator.clipboard.writeText(finalString)
-              .then(() => showToast('Copied all VIN data to clipboard!'))
-              .catch(() => showToast('Unable to copy.'));
-          });
-          copyAllContainer.appendChild(copyAllBtn);
-        }
+        // Now that decoding is complete, enable the Copy button
+        copyAllBtn.disabled = false;
+        copyAllBtn.addEventListener('click', () => {
+          const lines = allDecodedResults.map(item => getRowData(item));
+          const finalString = lines.join('\n');
+          navigator.clipboard.writeText(finalString)
+            .then(() => showToast('Copied all VIN data to clipboard!'))
+            .catch(() => showToast('Unable to copy.'));
+        });
 
         // Render each VIN block
         allDecodedResults.forEach((decodedItem, idx) => {
@@ -792,8 +787,8 @@
             li.textContent = `${f.label}: ${value}`;
             dataList.appendChild(li);
           });
-
           vinDiv.appendChild(dataList);
+
           resultsContainer.appendChild(vinDiv);
         });
 
@@ -806,20 +801,21 @@
       }
     });
 
-    // Create a single line for one VIN’s data, pipe-delimited
+    // -----------------------------------------------------------
+    // 8) BUILD A SINGLE LINE FOR PASTING
+    // -----------------------------------------------------------
     function getRowData(decodedItem) {
       const enabledFields = currentFieldsList.filter(f => f.enabled);
       const values = enabledFields.map(f => {
         let rawValue = decodedItem[f.propertyName] || 'null';
-        rawValue = String(rawValue)
-          .replace(/[\t\r\n]+/g, " ")
-          .replace(/\u00A0/g, " ")
-          .replace(/\s\s+/g, " ")
+        return String(rawValue)
+          .replace(/[\t\r\n]+/g, ' ')
+          .replace(/\u00A0/g, ' ')
+          .replace(/\s\s+/g, ' ')
           .trim();
-        return rawValue;
       });
 
-      // VIN as the first column:
+      // VIN as the first column
       const vinCol = decodedItem.VIN || 'null';
       return [vinCol, ...values].join("|");
     }

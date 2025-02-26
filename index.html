@@ -751,15 +751,21 @@
     });
 
     // Create a single tab-separated line for one VIN’s data
-   function getRowData(decodedItem) {
+ function getRowData(decodedItem) {
   const enabledFields = currentFieldsList.filter(f => f.enabled);
   const values = enabledFields.map(f => {
-    return decodedItem[f.propertyName] || 'null';
+    // Get the raw field from NHTSA
+    let rawValue = decodedItem[f.propertyName] || 'null';
+    // Convert to string (just in case) and remove any tabs/newlines
+    rawValue = String(rawValue).replace(/[\t\r\n]+/g, ' ');
+    // Trim leading/trailing spaces, just to be safe
+    rawValue = rawValue.trim();
+    return rawValue;
   });
-  
-  // Use the pipe character instead of tab:
+  // Now join everything with a pipe
   return values.join('|');
 }
+
 
 
     // Clear / Reset
